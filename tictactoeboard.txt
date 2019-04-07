@@ -1,0 +1,26 @@
+x|x|x		BASE FILLED TIC TAC TOE BOARD:  5 rows, 5 columns
+-----    
+x|x|x
+-----
+x|x|x
+
+     |     |
+     |     |            ULTIMATE TIC TAC TOE BOARD:  17 rows, 17 columns
+     |     |
+     |     |
+     |     |
+----- ----- -----
+     |     |
+     |     |
+     |     |
+     |     |
+     |     |
+----- ----- -----
+     |     |
+     |     |
+     |     |
+     |     |
+     |     |
+
+
+
