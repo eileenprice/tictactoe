@@ -21,7 +21,8 @@ int main() {
 	struct UltimateBoard createUltimateTicTacToeBoard();
 	void printBasicBoard(struct BasicBoard board);
 	void printUltimateBoard(struct UltimateBoard board);
-	struct UltimateBoard chooseMove(struct BasicBoard board);
+	struct BasicBoard chooseMove(struct BasicBoard board);
+	struct UltimateBoard chooseRandomMove(struct UltimateBoard board);
 	char* getUserSelectionBasic(struct BasicBoard board);
 	char* getUserSelectionUltimate(struct UltimateBoard board);
 	? checkForWinsBasic(struct BasicBoard board);
@@ -41,8 +42,9 @@ struct BasicBoard createBasicTicTacToeBoard() {
 
 //returns a 9x9 tic tac toe board with all characters inside initialized to ' '
 //LUCAS
-struct UltimateBoard createUltimateTicTacToeBoard() {
-
+struct UltimateBoard createUltimateTicTacToeBoard()
+{
+    //Planned Complete Date: Probably within a day or 2 of Matt completing the Basic Board
 }
 
 //prints the basic board in a human-readable format
@@ -53,19 +55,22 @@ void printBasicBoard(struct BasicBoard board) {
 
 //prints the ultimate board in a human-readable format
 //LUCAS
-void printUltimateBoard(struct UltimateBoard board) {
-
+void printUltimateBoard(struct UltimateBoard board)
+{
+    //Planned Complete Date: Once Matt is done printing the board
 }
 
 //AI function to choose the best move
 //EILEEN
-struct UltimateBoard chooseMove(struct BasicBoard board) {
+struct BasicBoard chooseMove(struct BasicBoard board) {
 
 }
 
 //chooses a random space that is not already occupied, fills it with the computer character, and retuns the new board
 //LUCAS
-struct UltimateBoard chooseRandomMove(struct UltimateBoard board) {
+struct UltimateBoard chooseRandomMove(struct UltimateBoard board)
+{
+    //Might not be needed.
 
 }
 
@@ -95,7 +100,7 @@ struct BasicBoard updateBasicBoardWithUserSelection(struct BasicBoard board, cha
 //places the user character at the appropriate location and returns the new board
 //NICK
 struct UltimateBoard updateUltimateBoardWithUserSelection(struct UltimateBoard board, char* userSelection) {
-	
+
 }
 
 //checks for any 3 in a rows.
@@ -111,11 +116,11 @@ struct UltimateBoard updateUltimateBoardWithUserSelection(struct UltimateBoard b
 //checks for wins in each quadrant of an UltimateBoard
 //LUCAS
 ? checkForInnerWinsUltimate(struct UltimateBoard board) {
-
+    //Might not be needed
 }
 
 //checks for overall win in UltimateBoard (like, 3 won quadrants in a row)
 //LUCAS
 ? checkForFullWinsUltimate(struct UltimateBoard board) {
-
+    //Called on Board complete.
 }
