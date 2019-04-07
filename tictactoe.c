@@ -8,6 +8,7 @@ struct BasicBoard{
 
 };
 
+//black 
 //9x9
 //should potentially be made up of 9 basic boards? dunno about that though
 //LUCAS
