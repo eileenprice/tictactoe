@@ -12,6 +12,7 @@ struct BasicBoard{
 //should potentially be made up of 9 basic boards? dunno about that though
 //LUCAS
 //hello
+//I AM THE MEME MACHINE
 struct UltimateBoard{
 
 };
