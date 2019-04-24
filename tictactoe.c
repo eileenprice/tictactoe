@@ -331,7 +331,7 @@ char checkForFullWinsUltimate(struct UltimateBoard *board)
             return board -> boardsCompleted[checks[x][0]];
         }
     }
-    if(board -> boardsCompleted[0] == 'f' && board -> boardsCompleted[1] == 'f' &&board -> boardsCompleted[2] == 'f' &&board -> boardsCompleted[3] == 'f' &&board -> boardsCompleted[4] == 'f' &&board -> boardsCompleted[5] == 'f' &&board -> boardsCompleted[6] == 'f' &&board -> boardsCompleted[7] == 'f' &&board -> boardsCompleted[8] == 'f')
+    if(board -> boardsCompleted[0] != ' ' && board -> boardsCompleted[1] != ' ' &&board -> boardsCompleted[2] != ' ' &&board -> boardsCompleted[3] != ' ' &&board -> boardsCompleted[4] != ' ' &&board -> boardsCompleted[5] != ' ' &&board -> boardsCompleted[6] != ' ' &&board -> boardsCompleted[7] != ' ' &&board -> boardsCompleted[8] != ' ')
         return 'f';
     return ' ';
     // 'X' / 'O' = Line Win
