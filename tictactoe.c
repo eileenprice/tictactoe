@@ -16,7 +16,7 @@ struct BasicBoard
 struct UltimateBoard
 {
     struct BasicBoard *boards[9];
-    bool boardsCompleted[9];
+    char boardsCompleted[9];
 };
 
 int main() {
@@ -29,9 +29,9 @@ int main() {
 	struct UltimateBoard chooseRandomMove(struct UltimateBoard board);
 	char* getUserSelectionBasic(struct BasicBoard board);
 	char* getUserSelectionUltimate(struct UltimateBoard board);
-	bool checkForWinsBasic(struct BasicBoard *board);
+	char checkForWinsBasic(struct BasicBoard *board);
 	bool checkForInnerWinsUltimate(struct UltimateBoard board);
-	bool checkForFullWinsUltimate(struct UltimateBoard *board);
+	char checkForFullWinsUltimate(struct UltimateBoard *board);
 	struct BasicBoard updateBasicBoardWithUserSelection(struct BasicBoard board, char* userSelection);
 	struct UltimateBoard updateUltimateBoardWithUserSelection(struct UltimateBoard board, char* userSelection);
 
@@ -132,6 +132,11 @@ int main() {
 struct BasicBoard *createBasicTicTacToeBoard()
 {
     struct BasicBoard *board = (struct BasicBoard *)malloc(sizeof(struct BasicBoard));
+    int x;
+    for(x=0; x<9;x++)
+    {
+        board -> spaces[x] = ' ';
+    }
     return board;
 }
 
@@ -144,6 +149,7 @@ struct UltimateBoard *createUltimateTicTacToeBoard()
     for(x=0; x<9;x++)
     {
         board -> boards[x] = createBasicTicTacToeBoard();
+        board -> boardsCompleted[x] = ' ';
     }
     return board;
 }
@@ -254,7 +260,7 @@ struct UltimateBoard updateUltimateBoardWithUserSelection(struct UltimateBoard b
 //but idk if that works so I put a ?
 //same for the other two checkforwins functions
 //ADIT
-bool checkForWinsBasic(struct BasicBoard *board)
+char checkForWinsBasic(struct BasicBoard *board)
 {
     int checks[8][3] = {{0,1,2}, {3,4,5}, {6,7,8}, {0,3,6}, {1,4,7}, {2,5,8}, {0,4,8}, {2,4,6}};
     int x;
@@ -262,11 +268,12 @@ bool checkForWinsBasic(struct BasicBoard *board)
     {
         if((board -> spaces[checks[x][0]] == 'x' || board -> spaces[checks[x][0]] == 'y') && board -> spaces[checks[x][0]] == board -> spaces[checks[x][1]] == board -> spaces[checks[x][2]])
         {
-            return true;
+            return board -> spaces[checks[x][0]];
         }
     }
-    return false;
-
+    return ' ';
+// 'X' / 'O' = Line Win
+// ' ' = No Win
 }
 
 //checks for wins in each quadrant of an UltimateBoard
@@ -278,7 +285,7 @@ bool checkForInnerWinsUltimate(struct UltimateBoard board)
 
 //checks for overall win in UltimateBoard (like, 3 won quadrants in a row)
 //LUCAS
-bool checkForFullWinsUltimate(struct UltimateBoard *board)
+char checkForFullWinsUltimate(struct UltimateBoard *board)
 {
     int checks[8][3] = {{0,1,2}, {3,4,5}, {6,7,8}, {0,3,6}, {1,4,7}, {2,5,8}, {0,4,8}, {2,4,6}};
     int x;
@@ -286,8 +293,10 @@ bool checkForFullWinsUltimate(struct UltimateBoard *board)
     {
         if((board -> boardsCompleted[checks[x][0]] == 'x' || board -> boardsCompleted[checks[x][0]] == 'y') && board -> boardsCompleted[checks[x][0]] == board -> boardsCompleted[checks[x][1]] == board -> boardsCompleted[checks[x][2]])
         {
-            return true;
+            return board -> boardsCompleted[checks[x][0]];
         }
     }
-    return false;
+    return ' ';
+    // 'X' / 'O' = Line Win
+    // ' ' = No Win
 }
