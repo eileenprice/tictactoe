@@ -56,7 +56,6 @@ int main() {
                 struct BasicBoard *board = createBasicTicTacToeBoard();
 
                 do {
-                    printBasicBoard(board);
                     //get user selection, update board with it, and print board
                             // char* userSelection = getUserSelectionBasic(board);
                             // updateBasicBoardWithUserSelection(board, userSelection);
@@ -64,7 +63,7 @@ int main() {
                     int num1;
                     do {
                         num1 = (rand() % (9));
-                    } while (board->spaces[num1] == ' ');
+                    } while (board->spaces[num1] != ' ');
                     board->spaces[num1] = 'x';
                     printf("User:\n");
                     printBasicBoard(board);
@@ -73,11 +72,18 @@ int main() {
                     int num;
                     do {
                         num = (rand() % (9));
-                    } while (board->spaces[num] == ' ');
+                    } while (board->spaces[num] != ' ');
                     board->spaces[num] = 'o';
                     printf("Computer:\n");
                     printBasicBoard(board);
-                } while (!checkForWinsBasic(board));
+                } while (checkForWinsBasic(board) == ' ');
+
+                if (checkForWinsBasic(board) == 'X') {
+                    printf("Congrats, you won!\n");
+                }
+                else {
+                    printf("Sorry, you lost!\n");
+                }
 
                 break;
             }
@@ -94,7 +100,7 @@ int main() {
                     int num1;
                     do {
                         num1 = (rand() % (9));
-                    } while (board->spaces[num1] == ' ');
+                    } while (board->spaces[num1] != ' ');
                     board->spaces[num1] = 'x';
                     printf("User:\n");
                     printBasicBoard(board);
@@ -103,7 +109,14 @@ int main() {
                     board = chooseMove(*board);
                     printf("Computer:\n");
                     printBasicBoard(board);
-                } while (!checkForWinsBasic(board));
+                } while (checkForWinsBasic(board) == ' ');
+
+                if (checkForWinsBasic(board) == 'X') {
+                    printf("Congrats, you won!\n");
+                }
+                else {
+                    printf("Sorry, you lost!\n");
+                }
                 break;
             }
 
