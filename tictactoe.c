@@ -24,7 +24,7 @@ int main() {
 	struct BasicBoard *createBasicTicTacToeBoard();
 	struct UltimateBoard *createUltimateTicTacToeBoard();
 	void printBasicBoard(struct BasicBoard *board);
-	void printUltimateBoard(struct UltimateBoard board);
+	void printUltimateBoard(struct UltimateBoard *board);
 	struct BasicBoard *chooseMove(struct BasicBoard board);
 	struct UltimateBoard chooseRandomMove(struct UltimateBoard board);
 	char* getUserSelectionBasic(struct BasicBoard board);
@@ -172,15 +172,34 @@ struct UltimateBoard *createUltimateTicTacToeBoard()
 void printBasicBoard(struct BasicBoard *board) {
     int i;
     for (i = 0; i < 9; i+=3) {
-        printf("%c %c %c\n", board->spaces[i], board->spaces[i+1], board->spaces[i+2]);
+        printf("%c|%c|%c\n", board->spaces[i], board->spaces[i+1], board->spaces[i+2]);
+        if(i == 0 || i == 3)
+        {
+            printf("-----\n");
+        }
     }
 }
 
 //prints the ultimate board in a human-readable format
 //LUCAS
-void printUltimateBoard(struct UltimateBoard board)
+void printUltimateBoard(struct UltimateBoard *board)
 {
-    //Planned Complete Date: Once Matt is done printing the board
+    int i,x;
+    for (i = 0; i < 9; i+=3)
+    {
+        for(x = 0; x < 3; x++)
+        {
+            printf("%c|%c|%c*%c|%c|%c*|%c|%c|%c", board -> boards[i] -> spaces[3*x], board -> boards[i] -> spaces[3*x+1], board -> boards[i] -> spaces[3*x+2], board -> boards[i+1] -> spaces[3*x], board -> boards[i+1] -> spaces[3*x+1], board -> boards[i+1] -> spaces[3*x+2], board -> boards[i+2] -> spaces[3*x], board -> boards[i+2] -> spaces[3*x+1], board -> boards[i+2] -> spaces[3*x+2]);
+            if(x == 0 || x == 1)
+            {
+                printf("-----*-----*-----\n");
+            }
+        }
+        if(i == 0 || i == 3)
+        {
+            printf("-----------------\n");
+        }
+    }
 }
 
 //AI function to choose the best move
@@ -282,10 +301,11 @@ char checkForWinsBasic(struct BasicBoard *board)
     {
         if((board -> spaces[checks[x][0]] == 'x' || board -> spaces[checks[x][0]] == 'o') && board -> spaces[checks[x][0]] == board -> spaces[checks[x][1]] &&  board -> spaces[checks[x][1]] == board -> spaces[checks[x][2]])
         {
-            printf("HERE");
             return board -> spaces[checks[x][0]];
         }
     }
+    if(board -> spaces[0] != ' ' && board -> spaces[1] != ' ' &&board -> spaces[2] != ' ' &&board -> spaces[3] != ' ' &&board -> spaces[4] != ' ' &&board -> spaces[5] != ' ' &&board -> spaces[6] != ' ' &&board -> spaces[7] != ' ' &&board -> spaces[8] != ' ')
+        return 'f';
     return ' ';
 // 'X' / 'O' = Line Win
 // ' ' = No Win
@@ -311,6 +331,8 @@ char checkForFullWinsUltimate(struct UltimateBoard *board)
             return board -> boardsCompleted[checks[x][0]];
         }
     }
+    if(board -> boardsCompleted[0] == 'f' && board -> boardsCompleted[1] == 'f' &&board -> boardsCompleted[2] == 'f' &&board -> boardsCompleted[3] == 'f' &&board -> boardsCompleted[4] == 'f' &&board -> boardsCompleted[5] == 'f' &&board -> boardsCompleted[6] == 'f' &&board -> boardsCompleted[7] == 'f' &&board -> boardsCompleted[8] == 'f')
+        return 'f';
     return ' ';
     // 'X' / 'O' = Line Win
     // ' ' = No Win
