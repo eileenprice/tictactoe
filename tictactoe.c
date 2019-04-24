@@ -89,7 +89,14 @@ struct UltimateBoard chooseRandomMove(struct UltimateBoard board)
 //makes sure that the selection the user entered is valid (i.e., the coordinate exists and is not already occupied)
 //ADIT
 char* getUserSelectionBasic(struct BasicBoard board) {
-
+	int row;
+	char column;
+	printf("Please select a row \n");
+	scanf("%lf", &row);
+	printf("Please select a column \n");
+	scanf("%s", &column);
+	char Selection = {row, column};
+	return &Selection;
 }
 
 //asks the user which space they would like to fill
