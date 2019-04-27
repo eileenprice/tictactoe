@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 //3x3
 //MATT
@@ -22,9 +23,9 @@ int main() {
 	//function prototypes
 	struct BasicBoard *createBasicTicTacToeBoard();
 	struct UltimateBoard *createUltimateTicTacToeBoard();
-	void printBasicBoard(struct BasicBoard board);
+	void printBasicBoard(struct BasicBoard *board);
 	void printUltimateBoard(struct UltimateBoard board);
-	struct BasicBoard chooseMove(struct BasicBoard board);
+	struct BasicBoard *chooseMove(struct BasicBoard board);
 	struct UltimateBoard chooseRandomMove(struct UltimateBoard board);
 	char* getUserSelectionBasic(struct BasicBoard board);
 	char* getUserSelectionUltimate(struct UltimateBoard board);
@@ -33,6 +34,108 @@ int main() {
 	char checkForFullWinsUltimate(struct UltimateBoard *board);
 	struct BasicBoard updateBasicBoardWithUserSelection(struct BasicBoard board, char* userSelection);
 	struct UltimateBoard updateUltimateBoardWithUserSelection(struct UltimateBoard board, char* userSelection);
+
+    int option;
+    char buffer[255];
+    srand(time(0));
+    do {
+    printf("Welcome to Ultimate Tic Tac Toe!\n");
+        printf("Please select an option.\n");
+        printf("1: Normal tic tac toe (Easy)\n");
+        printf("2: Normal tic tac toe (Hard)\n");
+        printf("3: Ultimate tic tac toe\n");
+        printf("4: Quit\n");
+
+        //get option
+        fgets(buffer, sizeof(buffer), stdin);
+        sscanf(buffer, "%d", &option);
+
+        switch(option) {
+            case 1 : {
+                //easy
+                struct BasicBoard *board = createBasicTicTacToeBoard();
+
+                do {
+                    //get user selection, update board with it, and print board
+                            // char* userSelection = getUserSelectionBasic(board);
+                            // updateBasicBoardWithUserSelection(board, userSelection);
+
+                    int num1;
+                    do {
+                        num1 = (rand() % (9));
+                    } while (board->spaces[num1] != ' ');
+                    board->spaces[num1] = 'x';
+                    printf("User:\n");
+                    printBasicBoard(board);
+
+                    //computer moves and board is printed
+                    int num;
+                    do {
+                        num = (rand() % (9));
+                    } while (board->spaces[num] != ' ');
+                    board->spaces[num] = 'o';
+                    printf("Computer:\n");
+                    printBasicBoard(board);
+                } while (checkForWinsBasic(board) == ' ');
+
+                if (checkForWinsBasic(board) == 'X') {
+                    printf("Congrats, you won!\n");
+                }
+                else {
+                    printf("Sorry, you lost!\n");
+                }
+
+                break;
+            }
+
+            case 2 : {
+                //hard
+                struct BasicBoard *board = createBasicTicTacToeBoard();
+
+                do {
+                    printBasicBoard(board);
+                    //get user selection, update board with it, and print board
+                                // char* userSelection = getUserSelectionBasic(board);
+                                // updateBasicBoardWithUserSelection(board, userSelection);
+                    int num1;
+                    do {
+                        num1 = (rand() % (9));
+                    } while (board->spaces[num1] != ' ');
+                    board->spaces[num1] = 'x';
+                    printf("User:\n");
+                    printBasicBoard(board);
+
+                    //computer moves and board is printed
+                    board = chooseMove(*board);
+                    printf("Computer:\n");
+                    printBasicBoard(board);
+                } while (checkForWinsBasic(board) == ' ');
+
+                if (checkForWinsBasic(board) == 'X') {
+                    printf("Congrats, you won!\n");
+                }
+                else {
+                    printf("Sorry, you lost!\n");
+                }
+                break;
+            }
+
+            case 3 : {
+                //ultimate
+                break;
+            }
+
+            case 4 : {
+                //end
+                break;
+            }
+
+            default :
+                //check for invalid input
+                printf("Not a valid option. Please enter a number between 1-9.\n");
+                option = 0;
+        }
+    } while (option != 4);
 
 	return 0;
 }
@@ -66,8 +169,10 @@ struct UltimateBoard *createUltimateTicTacToeBoard()
 
 //prints the basic board in a human-readable format
 //MATT
-void printBasicBoard(struct BasicBoard board) {
-
+void printBasicBoard(struct BasicBoard *board) {
+    for (int i = 0; i < 9; i+=3) {
+        printf("%c %c %c\n", board->spaces[i], board->spaces[i+1], board->spaces[i+2]);
+    }
 }
 
 //prints the ultimate board in a human-readable format
@@ -79,9 +184,51 @@ void printUltimateBoard(struct UltimateBoard board)
 
 //AI function to choose the best move
 //EILEEN
-struct BasicBoard chooseMove(struct BasicBoard board) {
-
+struct BasicBoard* chooseMove(struct BasicBoard board) {
+    void computerMove(struct BasicBoard );
+    computerMove(board);
+    return &board;
 }
+
+int minimax(struct BasicBoard board, char player) {
+    int move = -1;
+    int score = -2;//Losing moves are preferred to no move
+    int i;
+    for(i = 0; i < 9; ++i) {//For all moves,
+        if(board.spaces[i] == ' ') {//If legal,
+            board.spaces[i] = player;//Try the move
+            int thisScore = -minimax(board, player == 'o' ? 'x' : 'o');
+            if(thisScore > score) {
+                score = thisScore;
+                move = i;
+            }//Pick the one that's worst for the opponent
+            board.spaces[i] = 0;//Reset board after try
+        }
+    }
+    if(move == -1) return 0;
+    return score;
+}
+
+void computerMove(struct BasicBoard board) {
+    int minimax(struct BasicBoard, char);
+    int move = -1;
+    int score = -2;
+    int i;
+    for(i = 0; i < 9; ++i) {
+        if(board.spaces[i] == ' ') {
+            board.spaces[i] = 'o';
+            int tempScore = -minimax(board, 'x');
+            board.spaces[i] = ' ';
+            if(tempScore > score) {
+                score = tempScore;
+                move = i;
+            }
+        }
+    }
+    //returns a score based on minimax tree at a given node.
+    board.spaces[move] = 'x';
+}
+
 
 //chooses a random space that is not already occupied, fills it with the computer character, and retuns the new board
 //LUCAS
@@ -166,4 +313,3 @@ char checkForFullWinsUltimate(struct UltimateBoard *board)
     // 'X' / 'O' = Line Win
     // ' ' = No Win
 }
-
