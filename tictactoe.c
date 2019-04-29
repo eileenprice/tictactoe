@@ -25,7 +25,7 @@ int main() {
 	struct UltimateBoard *createUltimateTicTacToeBoard();
 	void printBasicBoard(struct BasicBoard *board);
 	void printUltimateBoard(struct UltimateBoard *board);
-	struct BasicBoard *chooseMove(struct BasicBoard board);
+    struct BasicBoard computerMove(struct BasicBoard );
 	struct UltimateBoard chooseRandomMove(struct UltimateBoard board);
 	char* getUserSelectionBasic(struct BasicBoard board);
 	char* getUserSelectionUltimate(struct UltimateBoard board);
@@ -67,6 +67,9 @@ int main() {
                     board->spaces[num1] = 'x';
                     printf("User:\n");
                     printBasicBoard(board);
+                    if(checkForWinsBasic(board) != ' ') {
+                        break;
+                    }
 
                     //computer moves and board is printed
                     int num;
@@ -78,11 +81,19 @@ int main() {
                     printBasicBoard(board);
                 } while (checkForWinsBasic(board) == ' ');
 
-                if (checkForWinsBasic(board) == 'X') {
+                char win = checkForWinsBasic(board);
+
+                if (win == 'x') {
                     printf("Congrats, you won!\n");
                 }
-                else {
+                else if (win == 'o') {
                     printf("Sorry, you lost!\n");
+                }
+                else if (win == 'f') { 
+                    printf("It's a tie!\n");
+                }
+                else {
+                    printf("Something went wrong.\n");
                 }
 
                 break;
@@ -93,29 +104,44 @@ int main() {
                 struct BasicBoard *board = createBasicTicTacToeBoard();
 
                 do {
-                    printBasicBoard(board);
                     //get user selection, update board with it, and print board
                                 // char* userSelection = getUserSelectionBasic(board);
                                 // updateBasicBoardWithUserSelection(board, userSelection);
+                    //random user move
                     int num1;
                     do {
                         num1 = (rand() % (9));
                     } while (board->spaces[num1] != ' ');
                     board->spaces[num1] = 'x';
+
+                    //display user move
                     printf("User:\n");
                     printBasicBoard(board);
+                    //check to see if user won or is full
+                    if(checkForWinsBasic(board) != ' ') {
+                        break;
+                    }
 
                     //computer moves and board is printed
-                    board = chooseMove(*board);
+                    *board = computerMove(*board);
                     printf("Computer:\n");
                     printBasicBoard(board);
-                } while (checkForWinsBasic(board) == ' ');
 
-                if (checkForWinsBasic(board) == 'X') {
+                } while (checkForWinsBasic(board) == ' ');
+                
+                //determine who won
+                char win = checkForWinsBasic(board);
+                if (win == 'x') {
                     printf("Congrats, you won!\n");
                 }
-                else {
+                else if (win == 'o') {
                     printf("Sorry, you lost!\n");
+                }
+                else if (win == 'f') { 
+                    printf("It's a tie!\n");
+                }
+                else {
+                    printf("Something went wrong.\n");
                 }
                 break;
             }
@@ -127,12 +153,13 @@ int main() {
 
             case 4 : {
                 //end
+                printf("Thanks for playing!\n");
                 break;
             }
 
             default :
                 //check for invalid input
-                printf("Not a valid option. Please enter a number between 1-9.\n");
+                printf("Not a valid option. Please enter a number between 1-4.\n");
                 option = 0;
         }
     } while (option != 4);
@@ -178,6 +205,7 @@ void printBasicBoard(struct BasicBoard *board) {
             printf("-----\n");
         }
     }
+    printf("\n");
 }
 
 //prints the ultimate board in a human-readable format
@@ -203,37 +231,45 @@ void printUltimateBoard(struct UltimateBoard *board)
 }
 
 //AI function to choose the best move
-//EILEEN
-struct BasicBoard* chooseMove(struct BasicBoard board) {
-    void computerMove(struct BasicBoard );
-    computerMove(board);
-    return &board;
-}
-
 int minimax(struct BasicBoard board, char player) {
+    char checkForWinsBasic(struct BasicBoard*);
+    
+    if(checkForWinsBasic(&board) != ' ') return -1;
+
     int move = -1;
     int score = -2;//Losing moves are preferred to no move
     int i;
     for(i = 0; i < 9; ++i) {//For all moves,
+        
         if(board.spaces[i] == ' ') {//If legal,
             board.spaces[i] = player;//Try the move
-            int thisScore = -minimax(board, player == 'o' ? 'x' : 'o');
+            //determine next player
+            char nextPlayer = 'o';
+            if(player == 'o') {
+                nextPlayer = 'x';
+            }
+
+            int thisScore = -minimax(board, nextPlayer);
             if(thisScore > score) {
                 score = thisScore;
                 move = i;
             }//Pick the one that's worst for the opponent
-            board.spaces[i] = 0;//Reset board after try
+            board.spaces[i] = ' ';//Reset board after try
         }
     }
     if(move == -1) return 0;
     return score;
 }
 
-void computerMove(struct BasicBoard board) {
+struct BasicBoard computerMove(struct BasicBoard board) {
     int minimax(struct BasicBoard, char);
+    //move is array index to play in
     int move = -1;
+    //score determines how good a move is
     int score = -2;
+    //i lets us check each possible move in the board
     int i;
+    //iterate over the board
     for(i = 0; i < 9; ++i) {
         if(board.spaces[i] == ' ') {
             board.spaces[i] = 'o';
@@ -246,16 +282,8 @@ void computerMove(struct BasicBoard board) {
         }
     }
     //returns a score based on minimax tree at a given node.
-    board.spaces[move] = 'x';
-}
-
-
-//chooses a random space that is not already occupied, fills it with the computer character, and retuns the new board
-//LUCAS
-struct UltimateBoard chooseRandomMove(struct UltimateBoard board)
-{
-    //Might not be needed.
-
+    board.spaces[move] = 'o';
+    return board;
 }
 
 //asks the user which space they would like to fill
@@ -288,10 +316,6 @@ struct UltimateBoard updateUltimateBoardWithUserSelection(struct UltimateBoard b
 }
 
 //checks for any 3 in a rows.
-//The reason the return type is ? is because I don't know what it should return
-//potentially a char that is either 'n' for no wins, 'c' for computer, or 'p' for player?
-//but idk if that works so I put a ?
-//same for the other two checkforwins functions
 //ADIT
 char checkForWinsBasic(struct BasicBoard *board)
 {
@@ -304,18 +328,11 @@ char checkForWinsBasic(struct BasicBoard *board)
             return board -> spaces[checks[x][0]];
         }
     }
-    if(board -> spaces[0] != ' ' && board -> spaces[1] != ' ' &&board -> spaces[2] != ' ' &&board -> spaces[3] != ' ' &&board -> spaces[4] != ' ' &&board -> spaces[5] != ' ' &&board -> spaces[6] != ' ' &&board -> spaces[7] != ' ' &&board -> spaces[8] != ' ')
+    if(board -> spaces[0] != ' ' && board -> spaces[1] != ' ' && board -> spaces[2] != ' ' && board -> spaces[3] != ' ' && board -> spaces[4] != ' ' && board -> spaces[5] != ' ' && board -> spaces[6] != ' ' && board -> spaces[7] != ' ' && board -> spaces[8] != ' ')
         return 'f';
     return ' ';
 // 'X' / 'O' = Line Win
 // ' ' = No Win
-}
-
-//checks for wins in each quadrant of an UltimateBoard
-//LUCAS
-bool checkForInnerWinsUltimate(struct UltimateBoard board)
-{
-    //Might not be needed
 }
 
 //checks for overall win in UltimateBoard (like, 3 won quadrants in a row)
