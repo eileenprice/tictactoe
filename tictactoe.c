@@ -17,20 +17,26 @@ struct UltimateBoard
     char boardsCompleted[9];
 };
 
+struct UltimateMove
+{
+    int quadrant;
+    int move;
+};
+
 int main() {
 	//function prototypes
 	struct BasicBoard *createBasicTicTacToeBoard();
 	struct UltimateBoard *createUltimateTicTacToeBoard();
-	void printBasicBoard(struct BasicBoard *board);
-	void printUltimateBoard(struct UltimateBoard *board);
-    struct BasicBoard computerMove(struct BasicBoard );
-	struct UltimateBoard chooseRandomMove(struct UltimateBoard board);
-	struct BasicBoard getUserSelectionBasic(struct BasicBoard board);
-	char* getUserSelectionUltimate(struct UltimateBoard board);
-	char checkForWinsBasic(struct BasicBoard *board);
-	bool checkForInnerWinsUltimate(struct UltimateBoard board);
-	char checkForFullWinsUltimate(struct UltimateBoard *board);
-	struct UltimateBoard updateUltimateBoardWithUserSelection(struct UltimateBoard board, char* userSelection);
+	void printBasicBoard(struct BasicBoard*);
+	void printUltimateBoard(struct UltimateBoard*);
+    struct BasicBoard computerMove(struct BasicBoard);
+    struct UltimateMove* computerMoveUltimate(struct UltimateBoard, int);
+	int getUserSelectionBasic(struct BasicBoard board);
+	struct UltimateMove* getUserSelectionUltimate(struct UltimateBoard, int);
+	char checkForWinsBasic(struct BasicBoard*);
+	bool checkForInnerWinsUltimate(struct UltimateBoard);
+	char checkForFullWinsUltimate(struct UltimateBoard*);
+    char updateBoardsCompleted(struct UltimateBoard *boardMatrix, struct BasicBoard *board);
 
     int option;
     char buffer[255];
@@ -54,7 +60,8 @@ int main() {
                 printBasicBoard(board);
                 do {
                     //get user selection and print board
-                    *board = getUserSelectionBasic(*board);
+                    int userSelection = getUserSelectionBasic(*board);
+                    board->spaces[userSelection] = 'x';
                     printf("User:\n");
                     printBasicBoard(board);
                     //check to see if user won or is full
@@ -99,7 +106,8 @@ int main() {
                 printBasicBoard(board);
                 do {
                     //get user selection and print board
-                    *board = getUserSelectionBasic(*board);
+                    int userSelection = getUserSelectionBasic(*board);
+                    board->spaces[userSelection] = 'x';
                     printf("User:\n");
                     printBasicBoard(board);
 
@@ -136,21 +144,29 @@ int main() {
                 //ultimate
                 struct UltimateBoard *board = createUltimateTicTacToeBoard();
                 printUltimateBoard(board);
+                int previousUserSelection = 0;
+                int previousComputerSelection = -1;
                 do {
                     //get user selection and print board
-                    // *board = getUserSelectionUltimate(*board);
+                    struct UltimateMove *userMove = getUserSelectionUltimate(*board, previousComputerSelection);
+                    // *board = getUserSelectionUltimate(*board, previousComputerSelection);
+                    board->boards[userMove->quadrant]->spaces[userMove->move] = 'x';
+                    previousUserSelection = userMove->move;
+
                     printf("User:\n");
                     printUltimateBoard(board);
 
-                    //check to see if user won or is full
-                    if(checkForFullWinsUltimate(board) != ' ') {
-                        break;
-                    }
+                    updateBoardsCompleted(board, board->boards[userMove->quadrant]);
 
                     //computer moves and board is printed
-                    // *board = computerMoveUltimate(*board);
-                    printf("Computer:\n");
+                    struct UltimateMove *computerMove = computerMoveUltimate(*board, previousUserSelection);
+                    board->boards[computerMove->quadrant]->spaces[computerMove->move] = 'o';
+
+                    printf("\nComputer:\n");
                     printUltimateBoard(board);
+                    previousComputerSelection = computerMove->move;
+                    printf("previousComputerSelection: %d\n", previousComputerSelection);
+                    updateBoardsCompleted(board, board->boards[computerMove->quadrant]);
 
                 } while (checkForFullWinsUltimate(board) == ' ');
                 
@@ -247,8 +263,27 @@ void printUltimateBoard(struct UltimateBoard *board)
     }
 }
 
-struct UltimateBoard computerMoveUltimate(struct UltimateBoard board, char* previousUserSelection) {
+struct UltimateMove* computerMoveUltimate(struct UltimateBoard board, int quadrant) {
+    int getBoardMappingFromCoordinates(char* );
+    bool isQuadrantFull(struct UltimateBoard , int );
 
+    int num;
+    if(isQuadrantFull(board, quadrant)) {
+        printf("quandrant is full!\n");
+        do {
+            num = (rand() % (9));
+        } while (isQuadrantFull(board, quadrant));
+        quadrant = num;
+    }
+    
+    do {
+        num = (rand() % (9));
+    } while (board.boards[quadrant]->spaces[num] != ' ');
+
+    struct UltimateMove *move = malloc(sizeof(struct UltimateMove));
+    move->quadrant = quadrant;
+    move->move = num;
+    return move;
 }
 
 //AI function to choose the best move
@@ -309,12 +344,12 @@ struct BasicBoard computerMove(struct BasicBoard board) {
 
 //asks the user which space they would like to fill
 //makes sure that the selection the user entered is valid (i.e., the coordinate exists and is not already occupied)
-//also updates board with the selection
-struct BasicBoard getUserSelectionBasic(struct BasicBoard board) {
+int getUserSelectionBasic(struct BasicBoard board) {
     int getBoardMappingFromCoordinates(char* );
 
     char *option = malloc(10*sizeof(char));
     bool keepGoing = true;
+    int index;
 
     do {
         printf("Please enter the coordinates of the space you wish to play in. (e.g., a1 for the upper left-hand corner)\n");
@@ -322,14 +357,13 @@ struct BasicBoard getUserSelectionBasic(struct BasicBoard board) {
         //remove the trailing newline created by fgets
         option[strcspn(option, "\n")] = 0;
 
-        int index = getBoardMappingFromCoordinates(option);
+        index = getBoardMappingFromCoordinates(option);
 
         if(index != -1) {
             if(board.spaces[index] != ' ') {
                 printf("Sorry, that space is occupied. Please pick again.\n");
             }
             else {
-                board.spaces[index] = 'x';
                 keepGoing = false;
             }
         } else {
@@ -337,15 +371,66 @@ struct BasicBoard getUserSelectionBasic(struct BasicBoard board) {
         }
     } while (keepGoing);
 
-    return board;
+    return index;
 }
 
 //asks the user which space they would like to fill
 //makes sure that the selection the user entered is valid (i.e., the coordinate exists and is not already occupied)
 //makes sure that the user selects a space that is within the quadrant that is allowed
-//NICK
-char* getUserSelectionUltimate(struct UltimateBoard board) {
+struct UltimateMove* getUserSelectionUltimate(struct UltimateBoard board, int quadrant) {
+    char* getCoordinatesFromBoardMapping(int);
+    int getUserSelectionBasic(struct BasicBoard);
+    bool isQuadrantFull(struct UltimateBoard, int);
+    int getBoardMappingFromCoordinates(char*);
 
+    char *option = malloc(10*sizeof(char));
+    bool keepGoing = true;
+    int userSelection;
+
+    //if first turn
+    if(quadrant == -1) {
+        //user may choose any quadrant
+        printf("First move, you may choose any quadrant to play in.\n");
+        printf("Which quadrant would you like to play in?\n");
+        //get preferred quadrant
+        fgets(option, 10, stdin);
+        //remove the trailing newline created by fgets
+        option[strcspn(option, "\n")] = 0;
+        //get index from string
+        quadrant = getBoardMappingFromCoordinates(option);
+    }
+
+    char* coordinates = getCoordinatesFromBoardMapping(quadrant);
+    //if designated quadrant is full, user may choose any quadrant
+    if(isQuadrantFull(board, quadrant)) {
+        do {
+            //inform user of situation
+            printf("Quandrant %s is full, you may choose any quadrant to play in.\n", coordinates);
+            printf("Which quadrant would you like to play in?\n");
+            //get preferred quadrant
+            fgets(option, 10, stdin);
+            //remove the trailing newline created by fgets
+            option[strcspn(option, "\n")] = 0;
+            //get index from string
+            quadrant = getBoardMappingFromCoordinates(option);
+        //make sure they choose a valid (not full) quadrant
+        } while (isQuadrantFull(board, quadrant));
+    }
+    
+    coordinates = getCoordinatesFromBoardMapping(quadrant);
+    //show current quadrant
+    printf("You are playing in quadrant %s.\n", coordinates);
+    printf("Quadrant %s:\n", coordinates);
+    printBasicBoard(board.boards[quadrant]);
+
+    //get input
+    userSelection = getUserSelectionBasic(*board.boards[quadrant]);
+
+    //return the 2D coordinates of where we are playing
+    struct UltimateMove *move = malloc(sizeof(struct UltimateMove));
+    move->quadrant = quadrant;
+    move->move = userSelection;
+    return move;
 }
 
 //checks for any 3 in a rows.
@@ -363,7 +448,7 @@ char checkForWinsBasic(struct BasicBoard *board)
     if(board -> spaces[0] != ' ' && board -> spaces[1] != ' ' && board -> spaces[2] != ' ' && board -> spaces[3] != ' ' && board -> spaces[4] != ' ' && board -> spaces[5] != ' ' && board -> spaces[6] != ' ' && board -> spaces[7] != ' ' && board -> spaces[8] != ' ')
         return 'f';
     return ' ';
-// 'X' / 'O' = Line Win
+// 'x' / 'o' = Line Win
 // ' ' = No Win
 }
 
@@ -408,4 +493,45 @@ int getBoardMappingFromCoordinates(char* coordinates) {
     } else {
         return -1;
     }
+}
+
+char* getCoordinatesFromBoardMapping(int boardMapping) {
+    if(boardMapping == 0) {
+        return "a1";
+    } else if(boardMapping == 1) {
+        return "b1";
+    } else if(boardMapping == 2) {
+        return "c1";
+    } else if(boardMapping == 3) {
+        return "a2";
+    } else if(boardMapping == 4) {
+        return "b2";
+    } else if(boardMapping == 5) {
+        return "c2";
+    } else if(boardMapping == 6) {
+        return "a3";
+    } else if(boardMapping == 7) {
+        return "b3";
+    } else if(boardMapping == 8) {
+        return "c3";
+    } else
+        return "";
+}
+
+bool isQuadrantFull(struct UltimateBoard board, int quadrant) {
+    return board.boardsCompleted[quadrant] != ' ';
+}
+
+char updateBoardsCompleted(struct UltimateBoard *boardMatrix, struct BasicBoard *board)
+{
+    int x;
+    for(x=0;x<9;x++)
+    {
+        if(boardMatrix -> boards[x] == board)
+        {
+            boardMatrix -> boardsCompleted[x] = checkForWinsBasic(board);
+            break;
+        }
+    }
+    return checkForFullWinsUltimate(boardMatrix);
 }
