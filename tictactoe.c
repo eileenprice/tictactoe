@@ -30,6 +30,7 @@ int main() {
 	char checkForWinsBasic(struct BasicBoard *board);
 	bool checkForInnerWinsUltimate(struct UltimateBoard board);
 	char checkForFullWinsUltimate(struct UltimateBoard *board);
+	char updateBoardsCompleted(struct UltimateBoard *boardMatrix, struct BasicBoard *board);
 	struct UltimateBoard updateUltimateBoardWithUserSelection(struct UltimateBoard board, char* userSelection);
 
     int option;
@@ -83,7 +84,7 @@ int main() {
                 else if (win == 'o') {
                     printf("Sorry, you lost!\n");
                 }
-                else if (win == 'f') { 
+                else if (win == 'f') {
                     printf("It's a tie!\n");
                 }
                 else {
@@ -114,7 +115,7 @@ int main() {
                     printBasicBoard(board);
 
                 } while (checkForWinsBasic(board) == ' ');
-                
+
                 //determine who won
                 char win = checkForWinsBasic(board);
                 if (win == 'x') {
@@ -123,7 +124,7 @@ int main() {
                 else if (win == 'o') {
                     printf("Sorry, you lost!\n");
                 }
-                else if (win == 'f') { 
+                else if (win == 'f') {
                     printf("It's a tie!\n");
                 }
                 else {
@@ -153,7 +154,7 @@ int main() {
                     printUltimateBoard(board);
 
                 } while (checkForFullWinsUltimate(board) == ' ');
-                
+
                 //determine who won
                 char win = checkForFullWinsUltimate(board);
                 if (win == 'x') {
@@ -162,7 +163,7 @@ int main() {
                 else if (win == 'o') {
                     printf("Sorry, you lost!\n");
                 }
-                else if (win == 'f') { 
+                else if (win == 'f') {
                     printf("It's a tie!\n");
                 }
                 else {
@@ -254,14 +255,14 @@ struct UltimateBoard computerMoveUltimate(struct UltimateBoard board, char* prev
 //AI function to choose the best move
 int minimax(struct BasicBoard board, char player) {
     char checkForWinsBasic(struct BasicBoard*);
-    
+
     if(checkForWinsBasic(&board) != ' ') return -1;
 
     int move = -1;
     int score = -2;//Losing moves are preferred to no move
     int i;
     for(i = 0; i < 9; ++i) {//For all moves,
-        
+
         if(board.spaces[i] == ' ') {//If legal,
             board.spaces[i] = player;//Try the move
             //determine next player
@@ -384,6 +385,20 @@ char checkForFullWinsUltimate(struct UltimateBoard *board)
     return ' ';
     // 'x' / 'o' = Line Win
     // ' ' = No Win
+}
+
+char updateBoardsCompleted(struct UltimateBoard *boardMatrix, struct BasicBoard *board)
+{
+    int x;
+    for(x=0;x<9;x++)
+    {
+        if(boardMatrix -> boards[x] == board)
+        {
+            boardMatrix -> boardsCompleted[x] = checkForWinsBasic(board);
+            break;
+        }
+    }
+    return CheckForFullWinsUltimate(boardMatrix);
 }
 
 int getBoardMappingFromCoordinates(char* coordinates) {
