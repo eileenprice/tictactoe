@@ -2,17 +2,15 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <time.h>
+#include <string.h>
 
 //3x3
-//MATT
 struct BasicBoard
 {
     char spaces[9];
 };
 
 //9x9
-//should potentially be made up of 9 basic boards? dunno about that though
-//LUCAS
 struct UltimateBoard
 {
     struct BasicBoard *boards[9];
@@ -27,12 +25,11 @@ int main() {
 	void printUltimateBoard(struct UltimateBoard *board);
     struct BasicBoard computerMove(struct BasicBoard );
 	struct UltimateBoard chooseRandomMove(struct UltimateBoard board);
-	char* getUserSelectionBasic(struct BasicBoard board);
+	struct BasicBoard getUserSelectionBasic(struct BasicBoard board);
 	char* getUserSelectionUltimate(struct UltimateBoard board);
 	char checkForWinsBasic(struct BasicBoard *board);
 	bool checkForInnerWinsUltimate(struct UltimateBoard board);
 	char checkForFullWinsUltimate(struct UltimateBoard *board);
-	struct BasicBoard updateBasicBoardWithUserSelection(struct BasicBoard board, char* userSelection);
 	struct UltimateBoard updateUltimateBoardWithUserSelection(struct UltimateBoard board, char* userSelection);
 
     int option;
@@ -54,29 +51,26 @@ int main() {
             case 1 : {
                 //easy
                 struct BasicBoard *board = createBasicTicTacToeBoard();
-
+                printBasicBoard(board);
                 do {
-                    //get user selection, update board with it, and print board
-                            // char* userSelection = getUserSelectionBasic(board);
-                            // updateBasicBoardWithUserSelection(board, userSelection);
-
-                    int num1;
-                    do {
-                        num1 = (rand() % (9));
-                    } while (board->spaces[num1] != ' ');
-                    board->spaces[num1] = 'x';
+                    //get user selection and print board
+                    *board = getUserSelectionBasic(*board);
                     printf("User:\n");
                     printBasicBoard(board);
+                    //check to see if user won or is full
                     if(checkForWinsBasic(board) != ' ') {
                         break;
                     }
 
-                    //computer moves and board is printed
+                    //computer moves
+                    //random since this is easy mode
                     int num;
                     do {
                         num = (rand() % (9));
                     } while (board->spaces[num] != ' ');
                     board->spaces[num] = 'o';
+
+                    //print board
                     printf("Computer:\n");
                     printBasicBoard(board);
                 } while (checkForWinsBasic(board) == ' ');
@@ -102,21 +96,13 @@ int main() {
             case 2 : {
                 //hard
                 struct BasicBoard *board = createBasicTicTacToeBoard();
-
+                printBasicBoard(board);
                 do {
-                    //get user selection, update board with it, and print board
-                                // char* userSelection = getUserSelectionBasic(board);
-                                // updateBasicBoardWithUserSelection(board, userSelection);
-                    //random user move
-                    int num1;
-                    do {
-                        num1 = (rand() % (9));
-                    } while (board->spaces[num1] != ' ');
-                    board->spaces[num1] = 'x';
-
-                    //display user move
+                    //get user selection and print board
+                    *board = getUserSelectionBasic(*board);
                     printf("User:\n");
                     printBasicBoard(board);
+
                     //check to see if user won or is full
                     if(checkForWinsBasic(board) != ' ') {
                         break;
@@ -148,6 +134,40 @@ int main() {
 
             case 3 : {
                 //ultimate
+                struct UltimateBoard *board = createUltimateTicTacToeBoard();
+                printUltimateBoard(board);
+                do {
+                    //get user selection and print board
+                    // *board = getUserSelectionUltimate(*board);
+                    printf("User:\n");
+                    printUltimateBoard(board);
+
+                    //check to see if user won or is full
+                    if(checkForFullWinsUltimate(board) != ' ') {
+                        break;
+                    }
+
+                    //computer moves and board is printed
+                    // *board = computerMoveUltimate(*board);
+                    printf("Computer:\n");
+                    printUltimateBoard(board);
+
+                } while (checkForFullWinsUltimate(board) == ' ');
+                
+                //determine who won
+                char win = checkForFullWinsUltimate(board);
+                if (win == 'x') {
+                    printf("Congrats, you won!\n");
+                }
+                else if (win == 'o') {
+                    printf("Sorry, you lost!\n");
+                }
+                else if (win == 'f') { 
+                    printf("It's a tie!\n");
+                }
+                else {
+                    printf("Something went wrong.\n");
+                }
                 break;
             }
 
@@ -168,7 +188,6 @@ int main() {
 }
 
 //returns a 3x3 tic tac toe board with all characters inside initialized to ' '
-//MATT
 struct BasicBoard *createBasicTicTacToeBoard()
 {
     struct BasicBoard *board = (struct BasicBoard *)malloc(sizeof(struct BasicBoard));
@@ -181,7 +200,6 @@ struct BasicBoard *createBasicTicTacToeBoard()
 }
 
 //returns a 9x9 tic tac toe board with all characters inside initialized to ' '
-//LUCAS
 struct UltimateBoard *createUltimateTicTacToeBoard()
 {
     struct UltimateBoard *board = (struct UltimateBoard *)malloc(sizeof(struct UltimateBoard));
@@ -195,21 +213,20 @@ struct UltimateBoard *createUltimateTicTacToeBoard()
 }
 
 //prints the basic board in a human-readable format
-//MATT
 void printBasicBoard(struct BasicBoard *board) {
     int i;
+    printf("   a b c\n\n");
     for (i = 0; i < 9; i+=3) {
-        printf("%c|%c|%c\n", board->spaces[i], board->spaces[i+1], board->spaces[i+2]);
+        printf("%d  %c|%c|%c\n", (i/3)+1, board->spaces[i], board->spaces[i+1], board->spaces[i+2]);
         if(i == 0 || i == 3)
         {
-            printf("-----\n");
+            printf("   -----\n");
         }
     }
     printf("\n");
 }
 
 //prints the ultimate board in a human-readable format
-//LUCAS
 void printUltimateBoard(struct UltimateBoard *board)
 {
     int i,x;
@@ -217,7 +234,7 @@ void printUltimateBoard(struct UltimateBoard *board)
     {
         for(x = 0; x < 3; x++)
         {
-            printf("%c|%c|%c*%c|%c|%c*|%c|%c|%c", board -> boards[i] -> spaces[3*x], board -> boards[i] -> spaces[3*x+1], board -> boards[i] -> spaces[3*x+2], board -> boards[i+1] -> spaces[3*x], board -> boards[i+1] -> spaces[3*x+1], board -> boards[i+1] -> spaces[3*x+2], board -> boards[i+2] -> spaces[3*x], board -> boards[i+2] -> spaces[3*x+1], board -> boards[i+2] -> spaces[3*x+2]);
+            printf("%c|%c|%c*%c|%c|%c*%c|%c|%c\n", board -> boards[i] -> spaces[3*x], board -> boards[i] -> spaces[3*x+1], board -> boards[i] -> spaces[3*x+2], board -> boards[i+1] -> spaces[3*x], board -> boards[i+1] -> spaces[3*x+1], board -> boards[i+1] -> spaces[3*x+2], board -> boards[i+2] -> spaces[3*x], board -> boards[i+2] -> spaces[3*x+1], board -> boards[i+2] -> spaces[3*x+2]);
             if(x == 0 || x == 1)
             {
                 printf("-----*-----*-----\n");
@@ -225,9 +242,13 @@ void printUltimateBoard(struct UltimateBoard *board)
         }
         if(i == 0 || i == 3)
         {
-            printf("-----------------\n");
+            printf("*****************\n");
         }
     }
+}
+
+struct UltimateBoard computerMoveUltimate(struct UltimateBoard board, char* previousUserSelection) {
+
 }
 
 //AI function to choose the best move
@@ -288,9 +309,35 @@ struct BasicBoard computerMove(struct BasicBoard board) {
 
 //asks the user which space they would like to fill
 //makes sure that the selection the user entered is valid (i.e., the coordinate exists and is not already occupied)
-//ADIT
-char* getUserSelectionBasic(struct BasicBoard board) {
+//also updates board with the selection
+struct BasicBoard getUserSelectionBasic(struct BasicBoard board) {
+    int getBoardMappingFromCoordinates(char* );
 
+    char *option = malloc(10*sizeof(char));
+    bool keepGoing = true;
+
+    do {
+        printf("Please enter the coordinates of the space you wish to play in. (e.g., a1 for the upper left-hand corner)\n");
+        fgets(option, 10, stdin);
+        //remove the trailing newline created by fgets
+        option[strcspn(option, "\n")] = 0;
+
+        int index = getBoardMappingFromCoordinates(option);
+
+        if(index != -1) {
+            if(board.spaces[index] != ' ') {
+                printf("Sorry, that space is occupied. Please pick again.\n");
+            }
+            else {
+                board.spaces[index] = 'x';
+                keepGoing = false;
+            }
+        } else {
+            printf("That's not a valid space, please try again.\n");
+        }
+    } while (keepGoing);
+
+    return board;
 }
 
 //asks the user which space they would like to fill
@@ -301,22 +348,7 @@ char* getUserSelectionUltimate(struct UltimateBoard board) {
 
 }
 
-//takes an input of the current board and the user selection of where they want to place their character
-//places the user character at the appropriate location and returns the new board
-//ADIT
-struct BasicBoard updateBasicBoardWithUserSelection(struct BasicBoard board, char* userSelection) {
-
-}
-
-//takes an input of the current board and the user selection of where they want to place their character
-//places the user character at the appropriate location and returns the new board
-//NICK
-struct UltimateBoard updateUltimateBoardWithUserSelection(struct UltimateBoard board, char* userSelection) {
-
-}
-
 //checks for any 3 in a rows.
-//ADIT
 char checkForWinsBasic(struct BasicBoard *board)
 {
     int checks[8][3] = {{0,1,2}, {3,4,5}, {6,7,8}, {0,3,6}, {1,4,7}, {2,5,8}, {0,4,8}, {2,4,6}};
@@ -336,7 +368,6 @@ char checkForWinsBasic(struct BasicBoard *board)
 }
 
 //checks for overall win in UltimateBoard (like, 3 won quadrants in a row)
-//LUCAS
 char checkForFullWinsUltimate(struct UltimateBoard *board)
 {
     int checks[8][3] = {{0,1,2}, {3,4,5}, {6,7,8}, {0,3,6}, {1,4,7}, {2,5,8}, {0,4,8}, {2,4,6}};
@@ -351,6 +382,30 @@ char checkForFullWinsUltimate(struct UltimateBoard *board)
     if(board -> boardsCompleted[0] != ' ' && board -> boardsCompleted[1] != ' ' &&board -> boardsCompleted[2] != ' ' &&board -> boardsCompleted[3] != ' ' &&board -> boardsCompleted[4] != ' ' &&board -> boardsCompleted[5] != ' ' &&board -> boardsCompleted[6] != ' ' &&board -> boardsCompleted[7] != ' ' &&board -> boardsCompleted[8] != ' ')
         return 'f';
     return ' ';
-    // 'X' / 'O' = Line Win
+    // 'x' / 'o' = Line Win
     // ' ' = No Win
+}
+
+int getBoardMappingFromCoordinates(char* coordinates) {
+    if(strcmp(coordinates, "a1") == 0) {
+        return 0;
+    } else if(strcmp(coordinates, "a2") == 0) {
+        return 3;
+    } else if(strcmp(coordinates, "a3") == 0) {
+        return 6;
+    } else if(strcmp(coordinates, "b1") == 0) {
+        return 1;
+    } else if(strcmp(coordinates, "b2") == 0) {
+        return 4;
+    } else if(strcmp(coordinates, "b3") == 0) {
+        return 7;
+    } else if(strcmp(coordinates, "c1") == 0) {
+        return 2;
+    } else if(strcmp(coordinates, "c2") == 0) {
+        return 5;
+    } else if(strcmp(coordinates, "c3") == 0) {
+       return 8;
+    } else {
+        return -1;
+    }
 }
