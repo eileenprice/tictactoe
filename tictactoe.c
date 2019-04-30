@@ -5,6 +5,10 @@
 #include <string.h>
 #include <fmod.h>
 #include <fmod_errors.h>
+#include <common.h>
+#include <common_platform.h>
+
+FSOUND_SAMPLE* handle;
 
 //3x3
 struct BasicBoard
@@ -27,23 +31,21 @@ struct UltimateMove
 
 int main() {
     //FMOD stuff
-    FMOD_RESULT result;
-    FMOD::Studio::System* system = NULL;
+    // init FMOD sound system
+   FSOUND_Init (44100, 32, 0);
 
-    result = FMOD::Studio::System::create(&system); // Create the Studio System object.
-    if (result != FMOD_OK)
-    {
-        printf("FMOD error! (%d) %s\n", result, FMOD_ErrorString(result));
-        exit(-1);
-    }
+   // load and play mp3
+   handle=FSOUND_Sample_Load (0,"JattJaguar.mp3",0, 0, 0);
+   FSOUND_PlaySound (0,handle);
 
-    // Initialize FMOD Studio, which will also initialize FMOD Low Level
-    result = system->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, 0);
-    if (result != FMOD_OK)
-    {
-        printf("FMOD error! (%d) %s\n", result, FMOD_ErrorString(result));
-        exit(-1);
-    }
+   // wait until the users hits a key to end the app
+   while (!_kbhit())
+   {
+   }
+
+   // clean up
+   FSOUND_Sample_Free (handle);
+   FSOUND_Close();
 	//function prototypes
 	struct BasicBoard *createBasicTicTacToeBoard();
 	struct UltimateBoard *createUltimateTicTacToeBoard();
